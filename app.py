@@ -54,4 +54,4 @@ if __name__ == '__main__':
     populate_cache()
 
     # Run the Flask server
-    app.run()
+    app.run(host='0.0.0.0', port=5000)
