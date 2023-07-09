@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Property Map</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <style>
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+        .price-label {
+            font-size: 12px;
+            text-align: center;
+            white-space: nowrap;
+        }
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div id="map"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <script>
+        var geojson = {{ geojson|safe }};
+        var map = L.map('map');
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
+            maxZoom: 18,
+        }).addTo(map);
+        
+        var markers = L.geoJSON(geojson, {
+            onEachFeature: function(feature, layer) {
+                var properties = feature.properties;
+                var popupContent = `
+                    <b>Type:</b> ${properties.type}<br>
+                    <b>Beds:</b> ${properties.beds}<br>
+                    <b>Price:</b> ${properties.price}<br>
+                    <b>Status:</b> ${properties.status}<br>
+                    <b>First Published:</b> ${properties.first_published}<br>
+                    <b>Baths:</b> ${properties.baths}<br>
+                    <b>Address:</b> ${properties.address}<br>
+                    <a href="${properties.url}" target="_blank">View Property</a><br>
+                    <a href="${properties.location}" target="_blank">Google Maps</a>
+                `;
+                layer.bindPopup(popupContent);
+            },
+            pointToLayer: function(feature, latlng) {
+                var price = feature.properties.price;
+                var marker = L.marker(latlng);
+                marker.bindTooltip(price, { permanent: true, opacity: 0.7 }).openTooltip();
+                return marker;
+            }
+        }).addTo(map);
+
+        // Fit the map bounds to all the markers
+        map.fitBounds(markers.getBounds());
+    </script>
+</body>
+</html>
+
