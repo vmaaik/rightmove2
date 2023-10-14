@@ -23,12 +23,21 @@
     <script>
         var geojson = {{ geojson|safe }};
         var map = L.map('map');
-        
+
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors',
             maxZoom: 18,
         }).addTo(map);
-        
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
         var markers = L.geoJSON(geojson, {
             onEachFeature: function(feature, layer) {
                 var properties = feature.properties;
@@ -41,7 +50,18 @@
                     <b>Baths:</b> ${properties.baths}<br>
                     <b>Address:</b> ${properties.address}<br>
                     <a href="${properties.url}" target="_blank">View Property</a><br>
-                    <a href="${properties.location}" target="_blank">Google Maps</a>
+                    <a href="${properties.location}" target="_blank">Google Maps</a><br>
+                    <button onclick="copyToClipboard(
+                        'Type: ${properties.type}\\n' +
+                        'Beds: ${properties.beds}\\n' +
+                        'Price: ${properties.price}\\n' +
+                        'Status: ${properties.status}\\n' +
+                        'First Published: ${properties.first_published}\\n' +
+                        'Baths: ${properties.baths}\\n' +
+                        'Address: ${properties.address}\\n' +
+                        'URL: ${properties.url}\\n' +
+                        'Location: ${properties.location}'
+                    )">Copy Content</button>
                 `;
                 layer.bindPopup(popupContent);
             },
