@@ -51,7 +51,7 @@ def index():
     html_content = render_template('index.html', geojson=cache)
     
     # Save the HTML content to a file (e.g., output.html)
-    with open('output.html', 'w') as file:
+    with open('index.html', 'w') as file:
         file.write(html_content)
 
     return html_content
